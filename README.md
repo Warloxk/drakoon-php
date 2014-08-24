@@ -7,7 +7,7 @@ It is completly rewriten and I think the time is come to make it public.
 
 This is still in beta and of course ABSOLUTELY NO WARRANTY, and not have any documentation yet.
 
-Included some modules, but skipped what is need some more work.
+Included some extensions, but skipped what is need some more work.
 
 The base framework is tested and currently in use on several sites, so it is working just fine.
 
