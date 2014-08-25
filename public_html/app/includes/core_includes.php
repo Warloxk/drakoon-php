@@ -8,4 +8,5 @@
  * This file includes the custom libraries like:
  * require_once 'app/lib/myClass.php';
  * $MyClass = new MyClass();
+ * and can contain the custom defined function
  */

@@ -4,39 +4,63 @@
  * @author  Peter Blaho <info@peterblaho.com>
  * @license http://opensource.org/licenses/MIT MIT License
  * @link    https://github.com/Warloxk/drakoon-php
- * @version 0.9b
+ * @version 1.0b
  */
 class Drakoon
 {
 	protected $home;
-	protected $a_supLang;
 
+	// settings from the config file
+	public $setSiteName;
+
+	public $setDefaultTitle;
+	public $setDefaultKeywords;
+	public $setDefaultDescription;
+	public $setDefaultAuthor;
+
+	public $setSiteVersion;
+
+	public $setSiteMaintenance;
+	public $setSiteMaintenanceException;
+	public $setDebug;
+	public $setCacheDir;
+	public $setImageDir;
+	public $setDefaultModule;
+	public $setDefaultSkin;
+	public $setSiteURL;
+	public $setDomain;
+	public $setTimeZone;
+	public $setTemplatesDir;
+	public $setPageNotFoundModule;
+	public $setAccessDeniedModule;
+	public $extBanners;
+	public $extComments;
+	public $setDefaultAvatar;
+	public $setAvatarDir;
+	public $ranks;
+
+	//
 	public $viewDir;
-	public $imageDir;
-	public $form = null;
-	public $image = null;
-	public $gmap = null;
-	public $review = null;
-	public $reviewSettings = null;
-
 	public $vars = array();
+	public $now;
+	public $currentHour;
+	public $thisMonday;
+	public $rootDir;
 
-	public $time = array();
-
-	public function __construct( $s_template = 'default' )
+	public function Init( $template = 'default' )
 	{
-		define('ROOT_DIR', dirname( dirname( __FILE__ ) ) );
+		$rootDir = dirname( dirname( __FILE__ ) );
 
-		// need some times :)
-		$this->time['now']         = date( 'Y-m-d H:i:s', time() ) ;
-		$this->time['currentHour'] = date( 'Y-m-d H', time() ) . ':00:00';
-		$this->time['thisMonday']  = date( 'Y-m-d', time() + ( 1 - date('w') ) * 86400 ) . ' 00:00:00';
+		// set the timezone
+		date_default_timezone_set( $this->setTimeZone );
 
-		$this->home = SET_SITE_URL;
-		$this->viewDir = 'public/template/' . $s_template . '/';
+		// need some times
+		$this->now         = date( 'Y-m-d H:i:s', time() ) ;
+		$this->currentHour = date( 'Y-m-d H', time() ) . ':00:00';
+		$this->thisMonday  = date( 'Y-m-d', time() + ( 1 - date('w') ) * 86400 ) . ' 00:00:00';
 
-		$this->SupportedLanguages();
-		$this->imageDir = SET_IMAGE_DIR;
+		$this->home = $this->setSiteURL;
+		$this->viewDir = 'public/template/' . $template;
 	}
 
 	/*public function __set( $name, $value )
@@ -64,24 +88,63 @@ class Drakoon
 		$this->vars[ $name ] = $value;
 	}
 
-	public function Test()
+	public function ParseURL()
 	{
-		require $this->viewDir . '_test.tpl';
+		$s_url = $_SERVER['REQUEST_URI'];
+		$a_url = explode( '/', substr( $s_url, 1 ) );
+		//$a_excludes = array( 'exclude_me' );
+		//$module = $a_url[0];
+		//$b_isModal = false;
+
+		/*if ( in_array( $module, $a_excludes ) )
+		{
+			die( 'exclude_me' );
+			$key = $drakoon->txtEscape( $a_url[1] );
+		}
+		else
+		{*/
+			foreach ( $a_url as $key => $value )
+			{
+				if ( !empty( $value ) && $key > 0 )
+				{
+					$data = explode( '-', $value, 2 );
+
+					if ( isset( $data[1] ) )
+					{
+						$_GET[ $data[0] ] = $data[1];
+
+						/*if ( $data[0] == 'post' )
+						{
+							$_REQUEST['post'] = 1;
+						}
+						else
+						{
+							$drakoon->VarSet( $data[0], $data[1] );
+						}*/
+					}
+				}
+			}
+		//}
+
+		if ( empty( $a_url[0] ) )
+		{
+			return $this->setDefaultModule;
+		}
+
+		return $a_url[0];
 	}
 
 	public function SiteMaintenance()
 	{
-		global $a_setSiteMaintenanceException;
-
-		if (SET_SITE_MAINTENANCE == 1)
+		if ( $this->setSiteMaintenance )
 		{
-			if (is_array($a_setSiteMaintenanceException) && !empty($a_setSiteMaintenanceException) && in_array($_SERVER['REMOTE_ADDR'], $a_setSiteMaintenanceException))
+			if ( is_array( $this->setSiteMaintenanceException ) && !empty( $this->setSiteMaintenanceException ) && in_array( $_SERVER['REMOTE_ADDR'], $this->setSiteMaintenanceException ) )
 			{
 				require $this->viewDir . '_siteMaintenanceOn.tpl';
 			}
 			else
 			{
-				require_once ROOT_DIR . '/errordocs/maintenance.php';
+				require_once $this->rootDir . '/errordocs/maintenance.php';
 				die();
 			}
 		}
@@ -89,7 +152,7 @@ class Drakoon
 
 	public function Debug()
 	{
-		if ( SET_DEBUG )
+		if ( $this->setDebug )
 		{
 			ini_set( 'display_errors', 1 );
 			error_reporting( E_ALL );
@@ -98,20 +161,17 @@ class Drakoon
 		}
 	}
 
-
-
-
 	public function _view( $s_view = '' )
 	{
 		global $module;
 
 		if ( empty( $s_view ) )
 		{
-			return $this->viewDir . $module . '.tpl';
+			return $this->viewDir . '/' . $module . '.tpl';
 		}
 		else
 		{
-			return $this->viewDir . $s_view;
+			return $this->viewDir . '/' . $s_view;
 		}
 	}
 
@@ -119,7 +179,7 @@ class Drakoon
 	{
 		global $module;
 
-		$file = $this->viewDir . 'head/' . $module . '.tpl';
+		$file = $this->viewDir . '/head/' . $module . '.tpl';
 
 		if ( file_exists( $file ) )
 		{
@@ -127,7 +187,7 @@ class Drakoon
 		}
 		else
 		{
-			return $this->viewDir . 'head/_default.tpl';;
+			return $this->viewDir . '/head/_default.tpl';
 		}
 	}
 
@@ -135,7 +195,7 @@ class Drakoon
 	{
 		require_once 'app/block/' . $s_blockName . '.php';
 
-		require_once $this->viewDir . 'block/' . $s_blockName . '.tpl';
+		require_once $this->viewDir . '/block/' . $s_blockName . '.tpl';
 	}
 
 	public function _snippet(  )
@@ -222,64 +282,6 @@ class Drakoon
 
 
 
-
-	public function SupportedLanguages()
-	{
-		//$this->a_supLang = $this->db->queryFirstColumn( 'SELECT id FROM langs WHERE `status` = 1 ORDER BY sort' );
-		$this->a_supLang = array();
-	}
-
-	public function Box( $s_title, $s_content, $s_id )
-	{
-		require $this->viewDir . '_box.tpl';
-	}
-
-	public function BoxTPL( $s_title, $s_templateFile, $s_id )
-	{
-		global $t;
-
-		ob_start();
-			require $this->viewDir . $s_templateFile;
-			$s_content = ob_get_contents();
-		ob_end_clean();
-
-		require $this->viewDir . '_box.tpl';
-	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	public function GetMonday( $plusWeek = 0, $addTime = false )
 	{
 		return date( 'Y-m-d', time() + ( ( 1 + ( $plusWeek * 7 ) ) - date( 'N' ) ) * 86400 ) . ( $addTime ? ' 00:00:00' : '' );
@@ -322,16 +324,11 @@ class Drakoon
 
 
 
-	public function DisplayCurrentTime()
-	{
-		return date('Y. m. d. H:i:s');
-	}
-
 	public function LoadTimerEnd()
 	{
 		global $start_loadtime, $end_loadtime;
 
-		$end_loadtime = explode(" ", microtime());
+		$end_loadtime = explode( ' ', microtime() );
 		$end_loadtime = $end_loadtime[1] + $end_loadtime[0];
 		$total_loadtime = ( $end_loadtime - $start_loadtime );
 		$s_total_loadtime = round( $total_loadtime, 4);
@@ -354,7 +351,7 @@ class Drakoon
 	{
 		if ( empty( $s_link ) )
 		{
-			header( 'location: /' . SET_DEFAULT_MODUL );
+			header( 'location: /' . $this->setDefaultModule );
 			exit();
 		}
 
@@ -380,7 +377,7 @@ class Drakoon
 		if ( empty( $s_link ) )
 		{
 			echo '<script type="text/javascript">
-					window.location = "/' . SET_DEFAULT_MODUL . '";
+					window.location = "/' . $this->setDefaultModule . '";
 				</script>';
 			exit();
 		}
@@ -402,60 +399,6 @@ class Drakoon
 				window.location = "' . $s_location . '";
 			</script>';
 		exit();
-	}
-
-	public function IsNumeric( $i_num, $i_greaterThan = null )
-	{
-		$b_ok = false;
-
-		if ( isset( $i_num ) )
-		{
-			if ( is_numeric( $i_num ) )
-			{
-				$b_ok = true;
-			}
-
-			if ( !is_null($i_greaterThan) && is_numeric( $i_greaterThan ) )
-			{
-				if ( $i_num > $i_greaterThan )
-				{
-					$b_ok = true;
-				}
-				else
-				{
-					$b_ok = false;
-				}
-			}
-		}
-
-		return $b_ok;
-	}
-
-	public function IsString( $s_string, $b_checkEmpty = true )
-	{
-		$b_ok = false;
-
-		if ( isset( $s_string ) )
-		{
-			if ( is_string( $s_string ) )
-			{
-				$b_ok = true;
-			}
-
-			if ( $b_checkEmpty )
-			{
-				if ( !empty( $s_string ) )
-				{
-					$b_ok = true;
-				}
-				else
-				{
-					$b_ok = false;
-				}
-			}
-		}
-
-		return $b_ok;
 	}
 
 	/**
@@ -579,28 +522,32 @@ class Drakoon
 	}
 
 
-
+	/**
+	 * Generate unique ID
+	 * length = 16 characters
+	 * filesystem safe
+	 */
 	public function UniqueId()
 	{
-		/*
-		  length = 16 character
-		  filesystem safe!
-		 */
 		$uni_id = sprintf( '%08x%04x%04x%02x%02x%012x', mt_rand(), mt_rand( 0, 65535 ), bindec( substr_replace ( sprintf( '%016b', mt_rand( 0, 65535 ) ), '0100', 11, 4 ) ), bindec( substr_replace( sprintf( '%08b', mt_rand( 0, 255 ) ), '01', 5, 2 ) ), mt_rand( 0, 255 ), mt_rand() );
 
 		return substr( $uni_id, 0, 12 ) . date( 'is', time() );
 	}
 
-	public function GenGUID() // 36 char length
+	/**
+	 * Generate GUID
+	 * length = 36 characters
+	 */
+	public function GenGUID()
 	{
-		$s = md5( uniqid( rand(  ), true ) );
+		$s = md5( uniqid( mt_rand(  ), true ) );
 		$guidText = substr( $s, 0, 8 ) . '-' . substr( $s, 8, 4 ) . '-' . substr( $s, 12, 4 ) . '-' . substr( $s, 16, 4 ) . '-' . substr( $s, 20 );
 		return $guidText;
 	}
 
 	public function DateToString( $datum = '1970-01-01', $fulldate = true )
 	{
-		$eng = array( 'January', 'February', 'Mdrakoonh', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday' );
+		$eng = array( 'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday' );
 		$hun = array( 'január', 'február', 'március', 'április', 'május', 'június', 'július', 'augusztus', 'szeptember', 'október', 'november', 'december', 'hétfő', 'kedd', 'szerda', 'csütörtök', 'péntek', 'szombat', 'vasárnap' );
 
 		if ( $fulldate == false )
@@ -695,12 +642,13 @@ class Drakoon
 			$from_name = $from;
 		}
 
-		$subject= "=?utf-8?b?".base64_encode($subject)."?=";
-	    $headers = "MIME-Version: 1.0\r\n";
-	    $headers.= "From: =?utf-8?b?".base64_encode($from_name)."?= <".$from.">\r\n";
-	    $headers.= "Content-Type: text/html;charset=utf-8\r\n";
-	    $headers.= "Reply-To: $from\r\n";
-	    $headers.= "X-Mailer: PHP/" . phpversion();
+		$subject = "=?utf-8?b?".base64_encode($subject)."?=";
+
+	    $headers  = "MIME-Version: 1.0\r\n";
+	    $headers .= "From: =?utf-8?b?".base64_encode($from_name)."?= <".$from.">\r\n";
+	    $headers .= "Content-Type: text/html;charset=utf-8\r\n";
+	    $headers .= "Reply-To: $from\r\n";
+	    $headers .= "X-Mailer: PHP/" . phpversion();
 	    mail( $to, $subject, $body, $headers );
 	}
 

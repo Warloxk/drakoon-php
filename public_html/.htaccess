@@ -1,0 +1,19 @@
+ErrorDocument 400 /errordocs/error400.php
+ErrorDocument 401 /errordocs/error401.php
+ErrorDocument 403 /errordocs/error403.php
+ErrorDocument 404 /errordocs/error404.php
+ErrorDocument 500 /errordocs/error500.php
+ErrorDocument 503 /errordocs/error503.php
+
+<LimitExcept GET POST>
+	Order allow,deny
+	Allow from all
+</LimitExcept>
+
+<IfModule mod_rewrite.c>
+	RewriteEngine on
+	RewriteBase /
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteRule . /index.php [L]
+</IfModule>

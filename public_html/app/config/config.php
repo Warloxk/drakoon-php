@@ -6,49 +6,58 @@
  * @link    https://github.com/Warloxk/drakoon-php
  * @version 1.0
  */
-define( 'SET_SITE_MAINTENANCE', '0' );
+$drakoon->setSiteName = 'drakoon-php';
 
-$a_setSiteMaintenanceException = array('127.0.0.1');
+$drakoon->setDefaultTitle = 'Default Title';
+$drakoon->setDefaultKeywords = 'drakoon-php, framework';
+$drakoon->setDefaultDescription = 'drakoon-php framework';
+$drakoon->setDefaultAuthor = 'Peter Blaho';
 
-define( 'SET_DEBUG', 0 );
+$drakoon->setSiteVersion = '1.0';
 
-define( 'SET_CACHE_DIR', 'cache' );
-
-define( 'SET_IMAGE_DIR', 'public/images' );
-
-define( 'SET_DEFAULT_MODUL', 'index' );
-
-define( 'SET_DEFAULT_SKIN', '_core' );
-
-
-define( 'SET_VERSION', '1.0' );
-
-define( 'SET_SITE_NAME', 'drakoon-php' );
-
-define( 'SET_SITE_URL', 'http://drakoon-php' );
-
-define( 'SET_DOMAIN', 'drakoon-php' );
-
-define( 'SET_TIMEZONE', 'Europe/Berlin' );
-
-define( 'SET_DEFAULT_LANGUAGE', 'hu' );
+$drakoon->setSiteMaintenance = false;
+$drakoon->setSiteMaintenanceException = [ '127.0.0.1' ];
+$drakoon->setDebug = false;
+$drakoon->setCacheDir = 'cache';
+$drakoon->setImageDir = 'public/images';
+$drakoon->setDefaultModule = 'index';
+$drakoon->setDefaultSkin = '_core';
+$drakoon->setDomain = 'drakoon-php';
+$drakoon->setTimeZone = 'Europe/Berlin';
+$drakoon->setTemplatesDir = 'templates';
+$drakoon->setPageNotFoundModule = 'page_not_found';
+$drakoon->setAccessDeniedModule = 'access_denied';
 
 
 
-define( 'SET_DEFAULT_KEYWORDS', '' );
-define( 'SET_DEFAULT_DESCRIPTION', '' );
-
-
-define ( 'SET_TEMPLATES_DIR', 'templates' );
-define ( 'SET_PAGE_NOT_FOUND_MODULE', 'page_not_found' );
-define ( 'SET_ACCESS_DENIED_MODULE', 'access_denied' );
+/**
+ * image extension
+ */
+$drakoon->extImage = false;
 
 
 
-define( 'SET_DEFAULT_AVATAR', 'public/drakoon/media/no_image/user.png' );
-define( 'SET_AVATAR_DIR',     'public/images/user/avatar/' );
-$ranks[255] = [ 'name' => 'Developer' ];
-$ranks[250] = [ 'name' => 'Admin' ];
-$ranks[100] = [ 'name' => 'User' ];
-$ranks[0]   = [ 'name' => 'Banned' ];
-///////////////////////////////////////////////////////////
+/**
+ * banners extension
+ */
+$drakoon->extBanners = false;
+
+
+
+/**
+ * comments extension
+ */
+$drakoon->extComments = false;
+
+
+
+/**
+ * User extension settings
+ */
+$drakoon->setDefaultAvatar = 'public/drakoon/media/no_image/user.png';
+$drakoon->setAvatarDir = 'public/images/user/avatar';
+/** user ranks */
+$drakoon->ranks[255] = [ 'name' => 'Developer' ];
+$drakoon->ranks[250] = [ 'name' => 'Admin' ];
+$drakoon->ranks[100] = [ 'name' => 'User' ];
+$drakoon->ranks[0]   = [ 'name' => 'Banned' ];
