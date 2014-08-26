@@ -18,7 +18,7 @@
 
 	<div class="group">
 		<div class="controls">
-			<input type="submit" name="post" value="Belépés">
+			<input type="submit" name="post" value="Login">
 		</div>
 	</div>
 </form>

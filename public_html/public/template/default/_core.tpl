@@ -32,7 +32,7 @@
 	<div id="wrapper">
 		<div id="headerContainer">
 			<div id="header">
-				<h1>link.eXoIndex.com</h1>
+				<h1>header</h1>
 			</div><!-- #header -->
 		</div><!-- #headerContainer -->
 
