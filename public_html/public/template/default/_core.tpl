@@ -10,13 +10,10 @@
 
 	<title><?=$m->title?></title>
 
-	<link rel="stylesheet" type="text/css" href="/public/template/default/css/base.css" />
 
-	<link rel="stylesheet" type="text/css" href="/public/template/default/css/grid.css" />
 
 	<link rel="stylesheet" type="text/css" href="/public/template/default/css/style.css" />
-	<link rel="stylesheet" type="text/css" href="/public/template/default/css/form.css" />
-	<link rel="stylesheet" type="text/css" href="/public/template/default/css/button.css" />
+
 
 	<?/*<link rel="shortcut icon" href="images/favicon.ico">
 	<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
